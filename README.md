@@ -15,3 +15,11 @@
 - [ ] Testing/ROS integration
 
 - [ ] Profit!
+
+
+## File Structure
+- `monocular`: keypoint calculation and PnP
+
+- `stereo`: stereo
+
+- `util`: miscellaneous helper scripts
