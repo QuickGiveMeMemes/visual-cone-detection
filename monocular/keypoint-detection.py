@@ -61,10 +61,10 @@ class KeypointDetector(nn.Module):
          
          # Fully connected
          nn.Flatten(),
-         nn.LazyLinear(512),
-         nn.ReLU(),
-         nn.LazyLinear(256),
-         nn.ReLU(),
+         # nn.LazyLinear(512),
+         # nn.ReLU(),
+         # nn.LazyLinear(256),
+         # nn.ReLU(),
          nn.LazyLinear(16),
          nn.ReLU(),
       )
