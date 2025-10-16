@@ -1,8 +1,53 @@
 import torch
+import os
+import json
 import numpy as np
 
 from torch import nn
+from PIL import Image
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 import torch.nn.functional as F 
+
+PRINT_MESSAGE_INTERVAL = 10
+LEARNING_RATE = 5e-2
+BATCH_SIZE = 64
+EPOCHS = 10
+
+class ConeDataset(Dataset):
+   def __init__(self, folder):
+      super().__init__()
+
+      self.FILE_PATH = os.path.join("data", folder)
+
+      with open(os.path.join(self.FILE_PATH, "annotations.coco.json")) as f:
+         self.data = json.load(f)
+      
+      self.images = [] * len(self.data["images"])
+      self.keypoints = [] * len(self.data["images"])
+
+      # Note: this for loop assumes the image ids are 0-indexed without gaps, which seems to be true
+      for img in self.data["images"]:
+         img_path = os.path.join(self.FILE_PATH, img["file_name"])
+         
+         with Image.open(img_path) as i:
+            self.images[img["id"]] = transforms.ToTensor(i)
+      
+      for kps in self.data["annotations"]:
+         x = kps["keypoints"]
+         if (x[2]!=2 or x[5]!=2 or x[8]!=2 or x[11]!=2 or 
+             x[14]!=2 or x[17]!=2 or x[20]!=2 or x[23]!=2):
+            raise Exception("Issues encountered with processing keypoint.")
+
+         # 6 7
+         self.keypoints[kps["image_id"]] = torch.tensor([x[0],x[1],x[3],x[4],x[6],x[7],x[9],x[10],
+                                                         x[12],x[13],x[15],x[16],x[18],x[19],x[21],x[22]])
+   
+   def __len__(self):
+      return len(self.images)
+   
+   def __getitem__(self, idx):
+      return self.images[idx], self.keypoints[idx]
 
 
 class BottleneckResidual(nn.Module):
@@ -79,9 +124,36 @@ class KeypointDetector(nn.Module):
    
    def forward(self, x) -> torch.Tensor:
       return self.model(x)
-      
-from torchsummary import summary
 
-test = KeypointDetector()
 
-summary(test, ( 3, 80, 80))
+class KeypointLoss(nn.Module):
+   def __init__(self):
+      super().__init__()
+   
+   def forward():
+      pass
+
+
+def train_epoch(dl, model, loss, optimizer):
+   model.train()
+
+   for i, (X, y) in enumerate(dl):
+      fwd = model(X)
+      loss = loss(fwd, y)
+
+      loss.backward()
+      optimizer.step()
+      optimizer.zero_grad()
+
+      if i % PRINT_MESSAGE_INTERVAL == 0:
+         loss, current = loss.item(), i * BATCH_SIZE + len(X)
+         print(f"loss: {loss:>7f}  [{current:>5d}/{len(dl.dataset):>5d}]")
+
+
+
+def test_epoch(dl, model, loss):
+   model.eval()
+
+   # TODO fully implement
+
+
