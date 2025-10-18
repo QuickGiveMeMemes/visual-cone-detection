@@ -6,6 +6,10 @@ DATA_PATH = "../data/fsae-cones-dataset.v1i.yolov11/test/images"
 
 model = YOLO("../models/cones.pt")
 
+total_params = sum(p.numel() for p in model.model.parameters())
+
+print(f"Total number of parameters in the model: {total_params}")
+
 images = list(map(lambda p: os.path.join(DATA_PATH, p), os.listdir(DATA_PATH)))
 
 for _ in range(10):
