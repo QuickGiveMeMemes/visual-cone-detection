@@ -169,6 +169,7 @@ class KeypointLoss(nn.Module):
 def train_epoch(dl, model, loss, optimizer):
     model.train()
 
+    total_loss = 0
     for i, (X, y) in enumerate(dl):
         fwd = model(X)
         loss = loss(fwd, y)
@@ -179,10 +180,40 @@ def train_epoch(dl, model, loss, optimizer):
 
         if i % PRINT_MESSAGE_INTERVAL == 0:
             loss, current = loss.item(), i * BATCH_SIZE + len(X)
+            total_loss += loss
             print(f"loss: {loss:>7f}  [{current:>5d}/{len(dl.dataset):>5d}]")
-
+    print("L")
 
 def test_epoch(dl, model, loss):
+    size = len(dl.dataset)
     model.eval()
 
-    # TODO fully implement
+    num_batches = len(dl)
+    test_loss, correct = 0, 0
+
+    with torch.no_grad():
+        for X, y in dl:
+            pred = model(X)
+            test_loss += loss(pred, y).item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+            print(X.numpy()[0][0], pred.numpy()[0][0], y.numpy()[0])
+
+    test_loss /= num_batches
+    correct /= size
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+
+
+train = ConeDataset("train")
+train_dl = DataLoader(train, batch_size=128, shuffle=True)
+test = ConeDataset("test")
+test_dl = DataLoader(test, batch_size=128, shuffle=True)
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Device: {device}")
+
+model = KeypointDetector()
+loss = KeypointLoss()
+optimizer = torch.optim.Adam(model.parameters())
+
+epochs = 50
