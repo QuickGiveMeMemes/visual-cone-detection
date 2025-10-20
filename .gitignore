@@ -1,3 +1,5 @@
 venv
 .vscode
 data
+monocular/runs
+monocular/test_out
