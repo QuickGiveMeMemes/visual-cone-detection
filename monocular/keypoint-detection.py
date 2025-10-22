@@ -13,8 +13,8 @@ import random
 import cv2
 
 
-PRINT_MESSAGE_INTERVAL = 10
-LEARNING_RATE = 0.001
+PRINT_MESSAGE_INTERVAL = 1
+LEARNING_RATE = 0.00001
 BATCH_SIZE = 64
 EPOCHS = 10000
 IMAGE_SIZE = 80
@@ -252,7 +252,7 @@ def random_test(model, dataset, device, epoch):
     cv2.waitKey(1)
 
 SAVE_FILE_HEADER = os.path.join("../save", "test_run")
-LOAD_FILE = None
+LOAD_FILE = "../save/test_run_epoch_500.pth"
 
 train = ConeDataset("train")
 train_dl = DataLoader(train, batch_size=BATCH_SIZE, shuffle=True)
