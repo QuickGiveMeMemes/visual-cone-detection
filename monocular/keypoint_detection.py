@@ -128,8 +128,8 @@ class KeypointDetector(nn.Module):
             # Bottleneck Blocks
             self.block(64, 2),
             self.block(128, 2),
-            self.block(256, 2),
-            self.block(512, 2),
+            self.block(256, 1),
+            # self.block(512, 2),
             # Fully connected
             nn.Flatten(),
             # nn.LazyLinear(512),
@@ -285,26 +285,26 @@ print(f"Device: {device}")
 # plt.hist(ratios, bins=100)
 # plt.show()
 
+if __name__ == "__init__":
+    model = KeypointDetector().to(device)
+    loss = KeypointLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-model = KeypointDetector().to(device)
-loss = KeypointLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    if LOAD_FILE is not None:
+        print(f"Loading from: {LOAD_FILE}")
+        model.load_state_dict(torch.load(LOAD_FILE, map_location=device))
 
-if LOAD_FILE is not None:
-    print(f"Loading from: {LOAD_FILE}")
-    model.load_state_dict(torch.load(LOAD_FILE, map_location=device))
-
-epochs = EPOCHS
-for i in range(epochs):
-    print(f"Epoch {i+1}/{epochs}")
-    train_epoch(train_dl, model, loss, optimizer, device, i)
-    test_epoch(test_dl, model, loss, device, i)
-    random_test(model, test, device, i)
+    epochs = EPOCHS
+    for i in range(epochs):
+        print(f"Epoch {i+1}/{epochs}")
+        train_epoch(train_dl, model, loss, optimizer, device, i)
+        test_epoch(test_dl, model, loss, device, i)
+        random_test(model, test, device, i)
 
 
-    if i % 10 == 0:
-        save_path = SAVE_FILE_HEADER + f"_epoch_{i}.pth"
-        torch.save(model.state_dict(), save_path)
-        print(f"Saved model to {save_path}")
+        if i % 10 == 0:
+            save_path = SAVE_FILE_HEADER + f"_epoch_{i}.pth"
+            torch.save(model.state_dict(), save_path)
+            print(f"Saved model to {save_path}")
 
-writer.close()
+    writer.close()
