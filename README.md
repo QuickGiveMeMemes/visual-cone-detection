@@ -2,15 +2,15 @@
 
 ## Tentative Plans
 
-- [ ] Train YOLO v11 on cone dataset (Roboflow does this for us)
+- [x] Train YOLO v11 on cone dataset (Roboflow does this for us)
 
-- [ ] Steal cone images from cone dataset by cropping out the given bounding boxes
+- [x] Steal cone images from cone dataset by cropping out the given bounding boxes
 
-- [ ] Label many keypoints on Roboflow
+- [x] Label many keypoints on Roboflow
 
-- [ ] Train CNN to obtain keypoints (or maybe do some more traditional CV to obtain these)
+- [x] Train CNN to obtain keypoints 
 
-- [ ] (RANSAC) PnP on keypoints to infer cone pose
+- [x] (RANSAC) PnP on keypoints to infer cone pose
 
 - [ ] Testing/ROS integration
 

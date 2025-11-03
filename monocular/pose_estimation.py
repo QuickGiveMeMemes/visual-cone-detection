@@ -22,12 +22,11 @@ class ConeEstimator:
 
     def estimate_pose(self, keypoints_2d):
         print(keypoints_2d)
-        success, rvec, tvec = cv2.solvePnP(
+        success, rvec, tvec, _ = cv2.solvePnPRansac(
             ConeEstimator.keypoints_3d,
             keypoints_2d,
             self.K,
             self.D,
-            flags=cv2.SOLVEPNP_ITERATIVE,  # TODO Try other methods
         )
 
         return success, rvec, tvec

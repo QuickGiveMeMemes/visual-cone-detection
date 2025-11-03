@@ -117,6 +117,8 @@ while True:
                 color = np.random.rand(3)
                 R, _ = cv2.Rodrigues(rvec)
                 plot_cone(ax, height=0.3, radius=0.1, R=R, t=tvec, color=color)
+            else:
+                print("PnP Failed!!")
 
 
     cv2.imshow("Keypoints", img)
