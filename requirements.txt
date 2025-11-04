@@ -1,3 +1,7 @@
 opencv-python
 PyYAML
 ultralytics
+pypylon
+torch
+torchvision
+matplotlib
