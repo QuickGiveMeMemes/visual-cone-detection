@@ -459,36 +459,48 @@ class Calibrator:
         return calibration_data
 
 
-from pypylon import pylon
+if __name__ == "__main__":
+    from pypylon import pylon
 
-cam = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
-cam.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
-converter = pylon.ImageFormatConverter()
-converter.OutputPixelFormat = pylon.PixelType_BGR8packed
-converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+    # tlf = pylon.TlFactory.GetInstance()
+    # tl = tlf.CreateTl("BaslerGigE")
+    # cam_info = tl.CreateDeviceInfo()
+    # cam_info.SetIpAddress("10.27.67.20")
+    # cam = pylon.InstantCamera(tlf.CreateDevice(cam_info))
+
+    cam = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
+    cam.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
+    converter = pylon.ImageFormatConverter()
+    converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+    converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
 
-calibrator = Calibrator(
-    1,
-    (9, 6),
-    "testing_cam",
-    "testing_cam_cal_mgs",
-    (1600, 1200),
-)
+    calibrator = Calibrator(
+        1,
+        (5, 8),
+        "testing_cam",
+        "testing_cam_cal_mgs",
+        (cam.Width.Value, cam.Height.Value),
+        calibType=CalibType.CHESSBOARD
+    )
 
-try:
-    while True:
-        grabResult = cam.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-        if not grabResult.GrabSucceeded():
-            print("Image acquisition failed!")
-            continue
+    try:
+        while True:
+            grabResult = cam.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+            if not grabResult.GrabSucceeded():
+                print("Image acquisition failed!")
+                continue
 
-        img = converter.Convert(grabResult).GetArray()
+            img = converter.Convert(grabResult).GetArray()
 
-        returned, used, path_saved = calibrator.process_frame(img)
+            returned, used, path_saved = calibrator.process_frame(img)
 
-        cv2.imshow("calibrator", returned)
-        cv2.waitKey(1)
+            returned = cv2.resize(returned, (1920, 1000))
 
-except KeyboardInterrupt:
+            cv2.imshow("calibrator", returned)
+            cv2.waitKey(1)
+
+    except KeyboardInterrupt:
+        pass
+
     calibrator.generate_calibration("cal_output.json")
