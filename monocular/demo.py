@@ -12,10 +12,10 @@ import torch
 from pose_estimation import ConeEstimator
 from pypylon import pylon
 
-BASLER = False
+BASLER = True
 
 DEVICE = "cpu"
-LOAD_FILE = "../models/test_run_cont8_epoch_300.pth"
+LOAD_FILE = "../models/small_cont1_epoch_600.pth"
 
 if BASLER:
     cam = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
@@ -23,6 +23,7 @@ if BASLER:
     converter = pylon.ImageFormatConverter()
     converter.OutputPixelFormat = pylon.PixelType_BGR8packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+
 
 else:
     cam = cv2.VideoCapture(0)

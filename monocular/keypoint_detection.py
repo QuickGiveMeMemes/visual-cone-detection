@@ -127,8 +127,8 @@ class KeypointDetector(nn.Module):
             nn.ReLU(),
             # Bottleneck Blocks
             self.block(64, 2),
-            self.block(128, 2),
-            self.block(256, 1),
+            # self.block(128, 2),
+            # self.block(256, 1),
             # self.block(512, 2),
             # Fully connected
             nn.Flatten(),
